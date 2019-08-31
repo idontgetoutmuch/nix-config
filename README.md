@@ -1,6 +1,7 @@
 # nix-config
 
 git clone https://github.com/idontgetoutmuch/nix-config.git
+
 nix-build -I nixpkgs=~/nixpkgs withR.nix
 
 This will produce something like
