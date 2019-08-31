@@ -4,7 +4,7 @@ git clone https://github.com/idontgetoutmuch/nix-config.git
 
 cd nix-config
 
-nix-build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz
+nix-build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz withR.nix
 
 This will produce something like
 
