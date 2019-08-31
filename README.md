@@ -2,7 +2,7 @@
 
 git clone https://github.com/idontgetoutmuch/nix-config.git
 
-nix-build -I nixpkgs=~/nixpkgs withR.nix
+nix-build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz
 
 This will produce something like
 
