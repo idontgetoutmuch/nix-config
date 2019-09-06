@@ -10,7 +10,7 @@ This will produce something like
 
 /nix/store/cpg4g97fzrdf099fnia8ydq8vh3pm0rj-ihaskell-with-packages
 
-Copy this and then
+N.B. do not copy the line above but what your build produces and then
 
 /nix/store/cpg4g97fzrdf099fnia8ydq8vh3pm0rj-ihaskell-with-packages/bin/ihaskell-notebook
 
