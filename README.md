@@ -1,10 +1,12 @@
 # nix-config
 
+## Jupyter notebook running Haskell with inline-r with required Haskell and R packages
+
 git clone https://github.com/idontgetoutmuch/nix-config.git
 
 cd nix-config
 
-nix-build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz withR.nix
+nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/b6d906732c823b0e5f55b3a9309a9cc120c977aa.tar.gz withR.nix
 
 This will produce something like
 
@@ -17,3 +19,11 @@ N.B. do not copy the line above but what your build produces and then
 This will launch a jupyter notebook environment
 
 Open e.g. TestPackages.ipynb
+
+## Jupyter running R with required packages
+
+Still in nix-config
+
+nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/b6d906732c823b0e5f55b3a9309a9cc120c977aa.tar.gz shell.nix
+
+This will launch a jupyter notebook with the required R packages.
