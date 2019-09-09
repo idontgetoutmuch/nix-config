@@ -2,11 +2,11 @@
 
 ## Jupyter notebook running Haskell with inline-r with required Haskell and R packages
 
+```
 git clone https://github.com/idontgetoutmuch/nix-config.git
 
 cd nix-config
 
-```
 nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/b6d906732c823b0e5f55b3a9309a9cc120c977aa.tar.gz withR.nix
 ```
 
