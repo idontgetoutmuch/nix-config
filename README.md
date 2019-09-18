@@ -1,3 +1,8 @@
+# Introduction
+
+These instructions use the nixpkgs hash that corresponds to 19.09
+which should be released "real soon now" (TM).
+
 # nix-config
 
 ## Jupyter notebook running Haskell with inline-r with required Haskell and R packages
@@ -7,7 +12,7 @@ git clone https://github.com/idontgetoutmuch/nix-config.git
 
 cd nix-config
 
-nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/b6d906732c823b0e5f55b3a9309a9cc120c977aa.tar.gz withR.nix
+nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/e6b068cd952e4640d416c2ccd62587d8a35cd774.tar.gz withR.nix
 ```
 
 This will produce something like
@@ -45,26 +50,33 @@ packages = self: [
   ];
 ```
 
-## Jupyter running R with required packages
+## Jupyter running R and Pythion with required packages
 
 Still in nix-config
 
 `
-nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/b6d906732c823b0e5f55b3a9309a9cc120c977aa.tar.gz shell.nix
+nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/e6b068cd952e4640d416c2ccd62587d8a35cd774.tar.gz shell.nix
 `
 
-This will launch a jupyter notebook with the required R packages.
+This will launch a jupyter notebook with the required R packages and
+the required Python packages.
 
-If you want extra packages, modify this line
+If you want extra R packages, modify this line
 
 `my-R-packages = with rPackages; [ cmaes ggplot2 dplyr ];`
 
 to include any required R packages.
 
-## Python with SUNDIALS (scikits-odes)
+If you want extra Python packages, modify this line
+
+`my-python-packages = [ python37Packages.numpy python37Packages.scikits-odes];`
+
+to include any required Python packages.
+
+## Python Shell with SUNDIALS (scikits-odes)
 
 ```
-nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/a77fba2ef9011d11ddb11f834a01e50c6236060a.tar.gz  -p python37Packages.scikits-odes --run "python3"
+	nix-shell --pure -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/e6b068cd952e4640d416c2ccd62587d8a35cd774.tar.gz  -p python37Packages.scikits-odes --run "python3"
 ```
 
 Strangely I didn't seem to have to mention `numpy` on the
@@ -77,5 +89,5 @@ Sun].
 # TODO
 
  1. Put hashes in a `.nix` file so they don't have to be typed on the command line.
- 2. Fix broken package so that we don't have to use a commit from early September.
+ 2. Single nix derivation that allows R, Haskell and Python kernels.
 
