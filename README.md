@@ -116,6 +116,112 @@ Of course, it's far from ideal that we would have to modifiy something in the ni
 such docker images but I imagine this can all be made independent of
 having to have all the source of nixpkgs itself.
 
+# Nixos on Azure
+## Introduction ##
+
+These are some incomplete notes from my experiences in setting up
+nixos on azure. I haven't gone back and checked I can re-create
+another azure nixos VM.
+
+### Acknowledgements ###
+
+It wouldnn't have been possible to do this without the help of the
+folks on #nixos especially @clever and @colemickens.
+
+## On Ubuntu ##
+
+I first had to create an ubuntu azure VM as I couldn't get the azure
+cli to work on my macbook.
+
+```
+uname -a
+Linux sundials 5.0.0-1018-azure #19~18.04.1-Ubuntu SMP Wed Aug 21 05:13:05 UTC 2019 x86<sub>64</sub> x86<sub>64</sub> x86<sub>64</sub> GNU/Linux
+```
+
+Also install nix and `nix-env -i tmux` unless you enjoy typing.
+
+You can see the changes I had to make on top of @colemickens great set
+of scripts [here](https://github.com/idontgetoutmuch/nixpkgs/tree/azure-bis).
+
+1.  Remove `kvm` from `requiredSystemFeatures` in `nixos/lib/testing.nix`.
+2.  Increase the diskSize in `azure-mkimage.nix` to something like 2048.
+3.  Wherever the instructions say `az.sh` just use `az`.
+4.  At some point in the proceedings you will have to
+    1.  `az login`
+5.  I also had to start an ssh agent `` eval `ssh-agent` `` and add a key
+    to it `ssh-add ~/.ssh/id_rsa`.
+6.  It's useful to install `pciutils` to check you actually do have a
+    GPU `lspci | grep -i NVIDIA`.
+
+### Create From Custom Image ###
+
+I changed `location:-"westus2"` to `location:-"uksouth"` in
+`create-image.sh` as I think azure objected to creating a machine in
+the area different to the one in which I was located (I may be
+mis-remembering). Azure didn't seem to object keeping the other US
+locations.
+
+    disk="$(./build-custom-vhd.sh)/disk.vhd"
+    azimage="$(group=nixos-user-vhds ./create-image.sh "nixos-${RANDOM}" "${disk}")"
+    azsigimage="$(group=nixos-user-vhds ./create-sig-image-version.sh "1.0.0" "${azimage}")"
+    
+    group="nixos-testvm-$RANDOM"
+    az group create -n "${group}" -l "westus2"
+    az vm create \
+      --name "testVM" \
+      --resource-group "${group}" \
+      --os-disk-size-gb "100" \
+      --image "${azsigimage}" \
+      --admin-username "${USER}" \
+      --location "WestCentralUS" \
+      --ssh-key-values "$(ssh-add -L)"
+
+
+## On Azure / Nixos ##
+
+Create or modify `/etc/nixos/configuration.nix`.
+
+    { modulesPath, ... }:
+    
+    {
+      # To build the configuration or use nix-env, you need to run
+      # either nixos-rebuild --upgrade or nix-channel --update
+      # to fetch the nixos channel.
+    
+      # This configures everything but bootstrap services,
+      # which only need to be run once and have already finished
+      # if you are able to see this comment.
+      imports = [ "${modulesPath}/virtualisation/azure-common.nix" ];
+      hardware.opengl.enable = true;
+      services.xserver.videoDrivers = [ "nvidia" ];
+      nixpkgs.config.allowUnfree = true;
+    }
+
+`sudo -i nixos-rebuild boot; sudo reboot`
+
+`ls /run/opengl-driver/lib` should have files in it as should `ls -l /dev/nvidia*`.
+
+If anything goes wrong, try stopping and starting the VM via the Azure
+Portal.
+
+    with import <nixpkgs> { config.allowUnfree = true; };
+    
+    stdenv.mkDerivation {
+     name = "myCUDA";
+     buildInputs = [ (python37.withPackages (pkgs: [pkgs.tensorflowWithCuda])) ];
+     LD_LIBRARY_PATH="${linuxPackages.nvidia_x11}/lib";
+    }
+
+## Notes ##
+
+Of course these may be ephemeral but I am going to leave them here anyway.
+
+1.  <https://github.com/colemickens/nixpkgs/blob/azure/nixos/maintainers/scripts/azure/release-images.nix#L5-L10>
+2.  <https://gist.github.com/cleverca22/f6ee9044aa4528c3bb52a0b195e9d938>
+3.  <https://logs.nix.samueldr.com/nixos/2019-09-22>
+4.  <https://github.com/tensorflow/tensorflow/issues/32623>
+
+
 # TODO
 
  1. Put hashes in a `.nix` file so they don't have to be typed on the command line.
