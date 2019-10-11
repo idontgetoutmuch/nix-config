@@ -86,6 +86,36 @@ Note that the hash of the nixpkgs database is different from the one
 for the notebooks. Our PR to fix `scikits-odes` only got accepted yesterday [2019-09-08
 Sun].
 
+# Nix for Docker Images #
+
+To build a a docker image from nix instructions, I have put an example [here](https://github.com/idontgetoutmuch/nixpkgs/blob/azure-bis/pkgs/build-support/docker/examples.nix#L108).
+
+This builds a docker image in which you can run R with the specified
+packages (`ggplot` and `dplyr` in this example).
+
+The instructions(!) on how to actually build the image are [here](https://github.com/idontgetoutmuch/nixpkgs/blob/azure-bis/pkgs/build-support/docker/examples.nix#L3).
+
+To make the image available (I think) I did
+
+    docker login docker.io
+    docker tag 7600adc93770 cinimod/foo-bar
+    docker push cinimod/foo-bar
+
+and then to use it
+
+    docker login
+    docker pull cinimod/foo-bar
+    docker run -it cinimod/foo-bar:latest R
+
+I started work on producing a docker image in which you could run
+Jupyter notebooks but my [attempt](https://github.com/idontgetoutmuch/nixpkgs/blob/azure-bis/pkgs/build-support/docker/examples.nix#L121) did **not** work.
+
+I imagine a bit of digging into notebooks and nix would enable someone to get this to work.
+
+Of course, it's far from ideal that we would have to modifiy something in the nixpkgs repo to build
+such docker images but I imagine this can all be made independent of
+having to have all the source of nixpkgs itself.
+
 # TODO
 
  1. Put hashes in a `.nix` file so they don't have to be typed on the command line.
